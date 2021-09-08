@@ -112,7 +112,7 @@ class Square extends React.Component {
             {this.renderSquare(8)}
           </div>
           <div>
-          {this.props.finished && <button className="reset" onClick= {() => this.resetGame()}>New Game</button>}
+          {this.props.finished && <button className="reset" onClick= {() => this.props.resetGame()}>New Game</button>}
           </div>
         </div>
       );
@@ -200,7 +200,18 @@ class Square extends React.Component {
         finished:false
       })
     }
-    newGame()
+    newGame(){
+      this.setState({
+        history: [
+          {
+            squares:Array(9).fill(null)
+          }
+        ],
+        xTurn: true,
+        finished: false,
+        status: "Next player: X"
+      });
+    }
     renderHistory(){
       var board = [];
       var hist = this.state.history.slice();
@@ -254,7 +265,7 @@ class Square extends React.Component {
       return (
         <div className="game">
           <div className="game-board">
-            <Board squares = {current.squares} handleClick={(i) => this.handleClick(i)} checkGame={() => this.checkGame()} status = {this.state.status} finished = {this.state.finished}/>
+            <Board squares = {current.squares} resetGame={()=> this.newGame()} handleClick={(i) => this.handleClick(i)} checkGame={() => this.checkGame()} status = {this.state.status} finished = {this.state.finished}/>
           </div>
           <div className="game-info">
             <div>{this.renderHistory()}</div>
