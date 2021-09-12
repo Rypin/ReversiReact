@@ -27,7 +27,7 @@ class Square extends React.Component {
       return <Square value = {this.props.board[x][y]} 
       onClick={() => this.props.handleClick(x, y)}
       update = {() => this.props.checkGame()}
-      col = {"sq"+y} 
+      col = {(x +"sq"+y)} 
       />;
     }
     render() {
@@ -53,6 +53,8 @@ class Square extends React.Component {
   class Game extends React.Component {
     constructor(props){
       super(props);
+
+      
       this.state = {
         history: [
           {
@@ -70,8 +72,15 @@ class Square extends React.Component {
         ],
         xTurn: true,
         finished: false,
-        status: "Next player: X"
+        status: "Next player: X",
+        player:[
+          {
+            A:{moves:[],pieces:[[3,3], [4,4]]},
+            B:{moves:[],pieces:[[3,4],[4,3]]}
+          }
+        ]
       };
+      this.getMoves = this.getMoves.bind(this);
     }
     handleClick(i, j){
       const history = this.state.history;
@@ -82,6 +91,127 @@ class Square extends React.Component {
         this.setState({history: history.concat([{squares:squares}]), xTurn:!this.state.xTurn, status: ("Next player: " + (this.state.xTurn ? 'O' : 'X'))}); 
         //reversed bool thing here because i need to see who is next
       }
+    }
+    getMoves(){
+      const history = this.state.history;
+      const current = history[history.length-1];
+      const board = current.squares;
+      // var pieces = this.state.xTurn? this.state.player.A.pieces.slice(): this.state.player.B.pieces.slice();
+      const pieces =[[3,3], [4,4]];
+      const boardSize = board.length;
+      const oppPlayer = this.state.xTurn? 'O':'X';
+      const foundMoves = []
+      for(let i =0; i < pieces.length; i++){
+        var [a,b] = pieces[i]
+        var flag = false;
+        for(let x = a; x < boardSize; x++){
+          
+          if(board[x][b] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][b] === oppPlayer){
+            flag = true;
+          }
+        }
+        for(let x = a; x > -1; x--){
+          if(board[x][b] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][b] === oppPlayer){
+            flag = true;
+          }
+        }
+        for(let x = a, y = b; x < boardSize && y < boardSize; x++, y++){
+          if(board[x][y] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][y]=== oppPlayer){
+            flag = true;
+          }
+        }
+        for(let x = a, y = b; x > -1 && y > -1; x--, y--){
+          if(board[x][y] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][y]=== oppPlayer){
+            flag = true;
+          }
+        }
+        for(let x = a, y = b;  x > -1 && y < boardSize; x--, y++){
+          if(board[x][y] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][y]=== oppPlayer){
+            flag = true;
+          }
+        }
+        for(let x = a, y = b; x < boardSize && y>-1; x++, y--){
+          if(board[x][y] === null){
+            if(flag)
+            {
+              foundMoves.push([x,b]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[x][y]=== oppPlayer){
+            flag = true;
+          }
+        }
+        for(let y = b; y < boardSize; y++){
+          
+          if(board[a][y] === null){
+            if(flag)
+            {
+              foundMoves.push([a,y]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[a][y] === oppPlayer){
+            flag = true;
+          }
+        }
+        for(let y = b; y>-1; y--){
+          if(board[a][y] === null){
+            if(flag)
+            {
+              foundMoves.push([a,y]);
+              flag=false;
+            }
+            break;
+          }
+          if(board[a][y] === oppPlayer){
+            flag = true;
+          }
+        }
+      }
+      console.log(foundMoves);
     }
     checkGame(){
       var lines=[
@@ -116,12 +246,6 @@ class Square extends React.Component {
       }
       return 0;
     }
-    // recordGame() {
-    //   var hist = this.state.history.slice();
-    //   hist.push(ChildBoard);
-    //   this.setState({history:hist});
-    //   console.log(hist);
-    // }
     loadGameState(i){
       //cut array down to chosen state
       alert(i);
@@ -191,6 +315,7 @@ class Square extends React.Component {
     render() {
       const history = this.state.history;
       const current = history[history.length-1];
+      this.getMoves();
       return (
         <div className="game">
           <div className="game-board">
