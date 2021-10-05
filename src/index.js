@@ -24,10 +24,19 @@ class Square extends React.Component {
   class Board extends React.Component {
 
     renderSquare(x, y) {
+      // var disabled = true;
+      // var moves = this.props.moves;
+      // for(var i = 0; i < moves.length; i++){
+      //   var a, b = this.props.moves[i];
+      //   if(a === x && b === y){
+      //       disabled = false;
+      //   }
+      // }
       return <Square value = {this.props.board[x][y]} 
       onClick={() => this.props.handleClick(x, y)}
       update = {() => this.props.checkGame()}
       col = {(x +"sq"+y)} 
+      disabled = {disabled}
       />;
     }
     render() {
@@ -92,12 +101,27 @@ class Square extends React.Component {
         //reversed bool thing here because i need to see who is next
       }
     }
+    getPieces(){
+      const history = this.state.history;
+      const board = history[history.length-1].squares;
+      var player = this.state.xTurn? 'X': 'O';
+      var foundPieces = [];
+// eslint-disable-next-line
+      board.map((line, row) =>  
+      // eslint-disable-next-line
+                  line.map((square, col) => 
+                    {
+                      if(square === player)
+                      {foundPieces.push([row,col])}
+                    }));
+      return foundPieces;
+    }
     getMoves(){
       const history = this.state.history;
       const current = history[history.length-1];
       const board = current.squares;
       // var pieces = this.state.xTurn? this.state.player.A.pieces.slice(): this.state.player.B.pieces.slice();
-      const pieces =[[3,3], [4,4]];
+      const pieces = this.getPieces();
       const boardSize = board.length;
       const oppPlayer = this.state.xTurn? 'O':'X';
       const foundMoves = []
@@ -315,11 +339,11 @@ class Square extends React.Component {
     render() {
       const history = this.state.history;
       const current = history[history.length-1];
-      this.getMoves();
+      const moves = this.getMoves();
       return (
         <div className="game">
           <div className="game-board">
-            <Board board = {current.squares} resetGame={()=> this.newGame()} handleClick={(i,j) => this.handleClick(i,j)} checkGame={() => this.checkGame()} status = {this.state.status} finished = {this.state.finished}/>
+            <Board board = {current.squares} moves = {moves} resetGame={()=> this.newGame()} handleClick={(i,j) => this.handleClick(i,j)} checkGame={() => this.checkGame()} status = {this.state.status} finished = {this.state.finished}/>
           </div>
           <div className="game-info">
             <div>{this.renderHistory()}</div>
